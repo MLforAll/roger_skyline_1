@@ -1,0 +1,22 @@
+---
+
+- include: user_ops.yml
+  with_dict: "{{ rsk1users }}"
+  loop_control:
+    loop_var: user
+    label: "{{ user.key }}"
+
+- name: Regen aliases
+  command: newaliases
+  ignore_errors: yes
+
+- name: Remove users in rsk1users_absent
+  user:
+    name: "{{ item }}"
+    state: absent
+  with_items: "{{ rsk1users_absent }}"
+
+- name: No password for root
+  user:
+    name: root
+    password: '*'

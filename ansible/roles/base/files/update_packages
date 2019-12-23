@@ -1,0 +1,64 @@
+#!/bin/sh
+
+# Functions
+
+print_color_msg() # $1 = msg | $2 = color | $3 = fd
+{
+	local myfd
+	if [ -z "$3" ]; then myfd=1; else myfd=$3; fi
+
+	{
+		[ -t $myfd ] && echo -n "$2"
+		echo "$1"
+		[ -t $myfd ] && echo -n '\033[0;39m'
+	} >&$myfd
+}
+
+fatal()
+{
+	print_color_msg "$1" '\033[1;31m' 2
+	[ -z "$2" ] && exit 1
+	exit $2
+}
+
+# VARS
+
+logfile='/var/log/update_script.log'
+
+# Code
+
+[ `id -u` -eq 0 ] || fatal 'You must be root!'
+
+tries=0
+while [ $tries -lt 3 ]
+do
+	ping -c1 google.com >/dev/null 2>&1 && break
+done
+[ $tries -eq 3 ] && fatal 'No internet connection detected!'
+
+if [ -t 0 -a -t 1 -a -t 2 -a "$1" != dontask ]; then
+	read -p 'Do you want to continue? [y/N] ' cont
+	[ "$(echo "$cont" | tr '[:upper:]' '[:lower:]')" = n -o -z "$cont" ] && exit 0
+fi
+
+if [ -t 1 -a -t 2 ]; then
+	exec 3>&1
+	exec 4>&2
+else
+	exec 3>>"$logfile"
+	exec 4>>"$logfile"
+	autoconfirm='-y'
+	echo >&3
+	echo "--> NEW UPDATE: $(date)" >&3
+	echo '-----------------------' >&3
+	echo >&3
+fi
+
+{
+	apt-get update || fatal '[ERROR] apt-get update'
+	apt-get upgrade "$autoconfirm" || fatal '[ERROR] apt-get upgrade'
+} >&3 2>&4
+
+print_color_msg '[OK] Packages have been updated!' '\033[1;32m' 3
+
+exit 0

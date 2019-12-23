@@ -1,0 +1,125 @@
+#article_container
+{
+	margin-top: 10px;
+	width: 95vw;
+	padding: 1vw;
+	margin-left: 2.5vw;
+	display: flex;
+	flex-wrap: wrap;
+}
+.article_obj
+{
+	width: 20vmin;
+	height: 20vmin;
+	visibility: visible;
+	background-color: rgb(25, 28, 30);
+	display: block;
+	border-radius: 5px;
+	background-repeat: no-repeat;
+	background-size: 93% 93%;
+	background-position: center;
+	margin-top: 1vmin;
+	margin-left: 1vmin;
+	transition: background-size 0.2s;
+}
+.article_obj:hover
+{
+	background-size: 94% 92%;
+	transition: background-size 0.5s;
+}
+.article_obj p
+{
+	color: white;
+	background-color: black;
+	position: relative;
+	font-size: 1em;
+	text-align:center;
+	opacity: 0.6;
+	margin-top: 14.5vmin;
+	position: relative;
+	bottom: 0;
+	left: 0;
+}
+.article_form .input_num
+{
+	cursor: pointer;
+	width: 25%;
+	height: auto;
+	padding: 1.5%;
+	background-color: white;
+	font-size: 0.8em;
+	margin-left: 14%;
+	margin-top: 8vim;
+	position: relative;
+	border: 0.1em solid black;
+	border-radius: 5px;
+	z-index: 10;
+}
+.article_form .input_confirm
+{
+	cursor: pointer;
+	width: 35%;
+	height: auto;
+	padding: 1.5%;
+	background-color: white;
+	font-size: 0.8em;
+	margin-left: 1%;
+	margin-top: 1.5%;
+	position: relative;
+	border: 0.1em solid black;
+	border-radius: 5px;
+	z-index: 10;
+}
+.article_form .input_num:hover
+{
+	font-weight: bold;
+}
+.article_form .input_confirm:hover
+{
+	font-weight: bold;
+}
+#filtrer_form
+{
+	width: 30vw;
+	margin-top: 75px;
+	margin-left: 35vw;
+	display: flex;
+	justify-content: space-around;
+}
+#filtrer_form input
+{
+	width: 8vw;
+	font-size: 0.8em;
+	font-weight: normal;
+	margin: 0px;
+	transition: font-weight 0.5s, font-size 0.5s;
+}
+#filtrer_form input:hover
+{
+	font-weight: bold;
+	font-size: 0.9em;
+	transition: font-weight 0.5s, font-size 0.5s;
+}
+#filtrer_form select
+{
+	width: 8vw;
+	font-size: 0.8em;
+	font-weight: normal;
+	border-radius: 0px;
+	border: none;
+	padding: 0px;
+	display: block;
+	align-items: flex-start;
+	transition: font-weight 0.5s, font-size 0.5s;
+}
+#filtrer_form select:hover
+{
+	font-weight: bold;
+	font-size: 0.9em;
+	transition: font-weight 0.5s, font-size 0.5s;
+}
+
+#filtrer_form select form
+{
+	line-height: 8vw;
+}

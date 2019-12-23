@@ -1,0 +1,47 @@
+---
+
+- name: "[nginx] Install Packages (this can take a while...)"
+  apt:
+    name:
+      - nginx
+      - php-fpm
+      - php-mysql
+      - php-mbstring
+
+- name: "[nginx] Copy Configuration"
+  copy:
+    src: dream
+    dest: "{{ dream_nginx_config_path }}"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "[nginx] Enable Configuration"
+  file:
+    src: "{{ dream_nginx_config_path }}"
+    dest: /etc/nginx/sites-enabled/dream
+    state: link
+
+- name: "[nginx] Purge Existing Code"
+  file:
+    path: /var/www/html
+    state: absent
+
+- name: "[nginx] Copy Code"
+  copy:
+    src: html
+    dest: /var/www
+    owner: root
+    group: root
+
+- name: "[nginx] db connection"
+  lineinfile:
+    path: /var/www/html/srcs/db_connection.php
+    regexp: "define\\('DBPASSWD', \\\".*\\\"\\);"
+    line: "define('DBPASSWD', \"{{ mysql_dream_password }}\");"
+  diff: no
+
+- name: "[nginx] Reload"
+  systemd:
+    name: nginx
+    state: reloaded

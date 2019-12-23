@@ -1,0 +1,109 @@
+---
+
+- name: "[MariaDB] Install Packages (this can take a while...)"
+  apt:
+    name:
+      - mariadb-server
+      - python-pip
+      - python-pexpect
+      - python-pymysql
+
+- name: "[MariaDB] Make sure root user uses unix_socket plugin"
+  command: "mysql -uroot -p'{{ mysql_root_password }}' -e 'UPDATE mysql.user SET plugin = \"unix_socket\" WHERE user = \"root\"; FLUSH PRIVILEGES;'"
+  ignore_errors: yes
+
+- name: "[MariaDB] Configure"
+  expect:
+    command: mysql_secure_installation
+    responses:
+      'Enter current password for root': ''
+      'Set root password?': 'y'
+      'New password': "{{ mysql_root_password }}"
+      'Re-enter new password': "{{ mysql_root_password }}"
+      'Remove anonymous users?': 'y'
+      'Disallow root login remotely?': 'y'
+      'Remove test database and access to it?': 'y'
+      'Reload privilege tables now?': 'y'
+
+- name: "[MariaDB] Make sure root user does not use any plugin"
+  command: "mysql -uroot -p'{{ mysql_root_password }}' -e 'UPDATE mysql.user SET plugin = \"\" WHERE user = \"root\"; FLUSH PRIVILEGES;'"
+
+- name: "[MariaDB] Create Users"
+  mysql_user:
+    name: "{{ item.key }}"
+    password: "{{ item.value.passwd }}"
+    encrypted: no
+    update_password: always
+    priv: "{{ item.value.privs }}"
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+  with_dict:
+    mysqladmin:
+      passwd: "{{ mysql_admin_password }}"
+      privs: '*.*:ALL,GRANT'
+    dream:
+      passwd: "{{ mysql_dream_password }}"
+      privs: 'rush00.*:SELECT,INSERT,UPDATE,DELETE'
+
+- name: "[MariaDB] Make sure root user uses unix_socket plugin"
+  command: "mysql -uroot -p'{{ mysql_root_password }}' -e 'UPDATE mysql.user SET plugin = \"unix_socket\" WHERE user = \"root\"; FLUSH PRIVILEGES;'"
+
+- name: "[MariaDB] Query DBs"
+  command: "mysql -e 'SHOW DATABASES'"
+  register: dbs_cmd
+
+- block:
+    - name: "[MariaDB] Create DB"
+      mysql_db:
+        name: rush00
+        state: present
+        login_user: mysqladmin
+        login_password: "{{ mysql_admin_password }}"
+
+    - name: "[MariaDB] Copy Setup Script"
+      copy:
+        src: dreamsetup
+        dest: /tmp
+        owner: root
+        group: root
+
+    - name: "[MariaDB] Copy Setup Script Resources"
+      copy:
+        src: /var/www/html/srcs/db_connection.php
+        dest: /tmp/dreamsetup
+        owner: root
+        group: root
+        remote_src: yes
+
+    - name: "[MariaDB] Setup Script Tweak"
+      replace:
+        path: /tmp/dreamsetup/run.php
+        regexp: "{{ item.key }}"
+        replace: "{{ item.value }}"
+      diff: no
+      with_dict:
+        "__root_pwd_goes_here__": "{{ dream_root_password }}"
+        "__norminet_pwd_goes_here__": "{{ dream_norminet_password }}"
+      loop_control:
+        label: "{{ item.key }}"
+
+    - name: "[MariaDB] Setup Script Resource Tweak"
+      lineinfile:
+        path: /tmp/dreamsetup/db_connection.php
+        regexp: "{{ item.key }}"
+        line: "{{ item.value }}"
+      diff: no
+      with_dict:
+        "define\\('DBUSER', \\\".*\\\"\\);": "define('DBUSER', \"mysqladmin\");"
+        "define\\('DBPASSWD', \\\".*\\\"\\);": "define('DBPASSWD', \"{{ mysql_admin_password }}\");"
+      loop_control:
+        label: "What da ya wanna see here?"
+
+    - name: "[MariaDB] Run Setup Script"
+      command: php /tmp/dreamsetup/run.php
+
+    - name: "[MariaDB] Cleanup"
+      file:
+        path: /tmp/dreamsetup
+        state: absent
+  when: '"rush00" not in dbs_cmd.stdout'

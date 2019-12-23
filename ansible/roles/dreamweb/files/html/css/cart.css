@@ -1,0 +1,55 @@
+.cart_container
+{
+	width: 70vw;
+	padding: 5vw;
+	margin-left: 10vw;
+	margin-top: 20vh;
+	background-color: rgb(25, 28, 30);
+	display: flex;
+	justify-content: center;
+	border-radius: 8px;
+	overflow-y: hidden;
+	flex-wrap: wrap;
+}
+.cart_container p
+{
+	color: white;
+	font-size: 0.9em;
+}
+.cart_container tbody
+{
+	width: 80%;
+	border: 1px solid white;
+}
+.cart_tabl
+{
+	width: 80%;
+	color: white;
+	display: block;
+}
+.cart_table th
+{
+	width: 80%;
+	font-size: 0.9em;
+	color: white;
+	padding: 1vmin;
+	border: 1px solid white;
+	text-align: left;
+	font-weight: normal;
+}
+.cart_container input
+{
+	transition: font-weight 0.5s, font-size 0.5s;
+}
+.cart_container input:hover
+{
+	font-weight: bold;
+	font-size: 0.9em;
+	transition: font-weight 0.5s, font-size 0.5s;
+}
+.cart_container p
+{
+	font-size: 1.5em;
+	padding: 1vmin;
+	margin-right: 3vmin;
+}

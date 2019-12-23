@@ -1,0 +1,21 @@
+---
+
+- name: Install psad from repos (this can take a while...)
+  apt:
+    name: psad
+
+- name: Copy Conf
+  copy:
+    src: psad.conf
+    dest: /etc/psad/psad.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Rebuild Signature
+  command: psad --sig-update
+
+- name: Restart psad
+  systemd:
+    name: psad
+    state: restarted

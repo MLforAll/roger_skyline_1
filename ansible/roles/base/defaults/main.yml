@@ -1,0 +1,7 @@
+---
+
+rsk_shell_scripts_dir_path: /usr/share/42
+rsk_timezone: Europe/Paris
+
+restart_networking_immediately: no
+reload_sshd_immediately: no

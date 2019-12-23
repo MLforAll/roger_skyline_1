@@ -1,0 +1,51 @@
+---
+
+- name: Make Shell Script Directory
+  file:
+    path: "{{ rsk_shell_scripts_dir_path }}"
+    owner: root
+    group: root
+    mode: 0700
+    state: directory
+
+- name: Copy Shell Scripts
+  copy:
+    src: "{{ item }}"
+    dest: "{{ rsk_shell_scripts_dir_path }}"
+    owner: root
+    group: root
+    mode: 0700
+  with_items:
+    - update_packages
+    - crontab_chk
+
+- name: Setup crontab
+  cron:
+    name: "{{ item.key }}"
+    hour: "{{ item.value.hour }}"
+    minute: "{{ item.value.minute }}"
+    day: "{{ item.value.dom }}"
+    month: "{{ item.value.mon }}"
+    weekday: "{{ item.value.dow }}"
+    job: "{{ item.value.job }}"
+  with_dict:
+    update_packages:
+      hour: "00"
+      minute: "04"
+      dom: "*"
+      mon: "*"
+      dow: mon
+      job: "{{ rsk_shell_scripts_dir_path }}/update_packages"
+    crontab_chk:
+      hour: "00"
+      minute: "00"
+      dom: "*"
+      mon: "*"
+      dow: "*"
+      job: "{{ rsk_shell_scripts_dir_path }}/crontab_chk"
+
+- name: Setup Special crontab
+  cron:
+    name: update_packages_reboot
+    special_time: reboot
+    job: "{{ rsk_shell_scripts_dir_path }}/update_packages"

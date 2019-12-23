@@ -1,0 +1,43 @@
+---
+
+- name: Install ssl-cert
+  apt:
+    name: ssl-cert
+
+- include: gen.yml
+  when: ssl_generate == true
+
+- name: Copy Cert & Key
+  copy:
+    src: "{{ item.value.src }}"
+    dest: "{{ item.value.dest }}"
+    owner: root
+    group: "{{ item.value.group }}"
+    mode: "{{ item.value.mode }}"
+  loop_control:
+    label: "{{ item.key }}"
+  with_dict:
+    cert:
+      src: roger.pem
+      dest: /etc/ssl/certs
+      group: root
+      mode: 0644
+    key:
+      src: roger.key
+      dest: /etc/ssl/private
+      group: ssl-cert
+      mode: 0640
+  diff: no
+  when: ssl_generate == false
+
+- name: Copy DHParams
+  copy:
+    src: roger.dh.pem
+    dest: /etc/ssl
+    owner: root
+    group: root
+    mode: 0644
+  diff: no
+
+- name: Update CA Certificates
+  command: update-ca-certificates

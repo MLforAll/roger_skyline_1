@@ -1,0 +1,21 @@
+---
+
+- name: Install fail2ban from repos (this can take a while...)
+  apt:
+    name: fail2ban
+
+- name: Copy Conf
+  copy:
+    src: "{{ item }}"
+    dest: /etc/fail2ban
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - jail.local
+    - jail.d
+
+- name: Restart fail2ban
+  systemd:
+    name: fail2ban
+    state: restarted

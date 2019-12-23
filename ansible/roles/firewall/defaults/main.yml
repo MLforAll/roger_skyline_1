@@ -1,0 +1,9 @@
+---
+
+firewall_ipv4: null
+firewall_ipv4_path: /etc/iptables/rules.v4
+
+firewall_ipv6: null
+firewall_ipv6_path: /etc/iptables/rules.v6
+
+apply_fw_immediately: yes

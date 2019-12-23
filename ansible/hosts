@@ -1,0 +1,15 @@
+# ini format
+[all:vars]
+ansible_port=2022
+ansible_connection=ssh
+ansible_python_interpreter=auto_silent
+
+[servers]
+roger-skyline-1		ansible_host=localhost	rsk1_hostname=roger-skyline-1
+
+# setup new server
+[setup:vars]
+ansible_port=2222
+
+[setup]
+newserv			ansible_host=localhost	rsk1_hostname=roger-skyline-1-5

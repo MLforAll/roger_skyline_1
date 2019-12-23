@@ -1,0 +1,39 @@
+---
+
+firewall_ipv4:
+  INPUT:
+    policy: DROP
+    rules:
+      - { port: 2022, proto: tcp }
+      - { port: 8080, proto: tcp }
+      - { port: 8443, proto: tcp }
+      - extra: "-m state --state RELATED,ESTABLISHED"
+      - proto: icmp
+      - interface: lo
+      - jump: LOG
+      - { jump: REJECT, extra: "--reject-with icmp-host-prohibited" }
+
+  FORWARD:
+    policy: DROP
+    rules:
+      - jump: LOG
+      - { jump: REJECT, extra: "--reject-with icmp-host-prohibited" }
+
+firewall_ipv6:
+  INPUT:
+    policy: DROP
+    rules:
+      - { port: 2022, proto: tcp }
+      - { port: 8080, proto: tcp }
+      - { port: 8443, proto: tcp }
+      - extra: "-m state --state RELATED,ESTABLISHED"
+      - proto: icmp
+      - interface: lo
+      - jump: LOG
+      - { jump: REJECT, extra: "--reject-with icmp6-adm-prohibited" }
+
+  FORWARD:
+    policy: DROP
+    rules:
+      - jump: LOG
+      - { jump: REJECT, extra: "--reject-with icmp6-adm-prohibited" }

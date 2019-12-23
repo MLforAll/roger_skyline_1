@@ -1,0 +1,39 @@
+---
+
+- name: "{{ item.key }} rules (file: {{ item.value.path }})"
+  copy:
+    dest: "{{ item.value.path }}"
+    content: "*filter
+
+      {%set desc = item.value.desc%}\
+      :INPUT {%if desc.INPUT.policy is defined%}{{desc.INPUT.policy}}{%else%}ACCEPT{%endif%} [0:0]
+
+      :FORWARD {%if desc.FORWARD.policy is defined%}{{desc.FORWARD.policy}}{%else%}ACCEPT{%endif%} [0:0]
+
+      :OUTPUT {%if desc.OUTPUT.policy is defined%}{{desc.OUTPUT.policy}}{%else%}ACCEPT{%endif%} [0:0]
+
+      {% for k, v in desc.items() %}\
+      {% for rule in v.rules %}\
+      -A {{ k }}\
+      {%if rule.interface is defined%} -i {{ rule.interface }}{%endif%}\
+      {%if rule.proto is defined%} -p {{ rule.proto }}{%endif%}\
+      {%if rule.port is defined%} --dport {{ rule.port }}{%endif%}
+      -j {%if rule.jump is defined%}{{ rule.jump }}{%else%}ACCEPT{%endif%}\
+      {%if rule.extra is defined%} {{ rule.extra }}{%endif%}
+
+
+      {% endfor %}\
+      {% endfor %}\
+      COMMIT\n"
+  when: item.value.desc != None
+
+- name: "{{ item.key }} rules restore (file: {{ item.value.path }})"
+  copy:
+    dest: "{{ item.value.path }}"
+    content: |
+      *filter
+      :INPUT ACCEPT [0:0]
+      :FORWARD ACCEPT [0:0]
+      :OUTPUT ACCEPT [0:0]
+      COMMIT
+  when: item.value.desc == None

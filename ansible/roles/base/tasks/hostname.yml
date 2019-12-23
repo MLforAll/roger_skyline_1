@@ -1,0 +1,15 @@
+---
+
+- set_fact:
+    new_hostname: "{{ hostvars[inventory_hostname].rsk1_hostname }}"
+    old_hostname: "{{ ansible_hostname }}"
+
+- name: Set hostname
+  hostname:
+    name: "{{ new_hostname }}"
+
+- name: Set hostname in /etc/hosts
+  replace:
+    path: /etc/hosts
+    regexp: "{{ old_hostname }}"
+    replace: "{{ new_hostname }}"

@@ -1,0 +1,43 @@
+# New Server: ansible-playbook -i hosts rsk1-install.yml -l setup -k -u root --diff
+# Re-run    : ansible-playbook -i hosts rsk1-install.yml -K --diff -l servers
+#
+# -u: user
+# -k: asks for user password (ssh)
+# -K: asks for sudo password
+# -l: filters hosts
+---
+- hosts: all
+  gather_facts: yes
+  become: yes
+
+  vars_files:
+    - vars/main.yml
+    - vars/secret.yml
+
+  vars_prompt:
+    - name: should_reboot_end
+      prompt: "Reboot at end of playbook if needed? (yes/anything)"
+      private: no
+
+  roles:
+    - base
+    - ssl
+    - fail2ban
+    - psad
+    - dreamweb
+    - firewall
+
+  post_tasks:
+    - block:
+        - debug:
+            msg: "Reboot the server to apply modifications"
+        - name: /sbin/reboot
+          command: /sbin/reboot
+          ignore_errors: yes
+          when: should_reboot_end == "yes"
+      when: >
+        (restart_networking_immediately is defined and restart_networking_immediately == false)
+        or
+        (reload_sshd_immediately is defined and reload_sshd_immediately == false)
+        or
+        (apply_fw_immediately is defined and apply_fw_immediately == false)

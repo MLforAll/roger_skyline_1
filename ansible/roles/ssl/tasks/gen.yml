@@ -1,0 +1,44 @@
+---
+
+- name: Cleanup
+  file:
+      path: /tmp/rogerssl
+      state: absent
+
+- name: Work Directory
+  file:
+    path: /tmp/rogerssl
+    state: directory
+
+- name: Generate SSL Certificates
+  shell: "openssl req -x509 -newkey rsa:2048 -keyout roger.key.tmp -out roger.pem -days 365 -nodes
+      -subj '/C={{ssl_country}}/ST={{ssl_state}}/L={{ssl_city}}/O={{ssl_o}}/emailAddress={{ssl_email}}' &&
+    openssl rsa -in roger.key.tmp -out roger.key &&
+    rm roger.key.tmp"
+  args:
+    executable: /bin/bash
+    chdir: /tmp/rogerssl
+
+- name: Copy Cert
+  copy:
+    src: /tmp/rogerssl/roger.pem
+    dest: /etc/ssl/certs
+    owner: root
+    group: root
+    mode: 0644
+    remote_src: yes
+
+- name: Copy Key
+  copy:
+    src: /tmp/rogerssl/roger.key
+    dest: /etc/ssl/private
+    owner: root
+    group: ssl-cert
+    mode: 0640
+    remote_src: yes
+  diff: no
+
+- name: Cleanup
+  file:
+      path: /tmp/rogerssl
+      state: absent

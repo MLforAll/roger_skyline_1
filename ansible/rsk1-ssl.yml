@@ -1,0 +1,8 @@
+# ansible-playbook -i hosts rsk1-ssl.yml -K --diff -l HOSTNAME
+---
+- hosts: servers
+  gather_facts: yes
+  become: yes
+
+  roles:
+    - ssl

@@ -1,0 +1,126 @@
+*
+{
+	margin: 0;
+	padding: 0;
+}
+body
+{
+	width: 100vw;
+	height: 100vh;
+	background-color: rgb(217, 217, 217);
+	overflow-x: hidden;
+}
+input
+{
+	width: 12vw;
+	height: 20px;
+	margin: 10px;
+	border-radius: 1px;
+	border: none;
+}
+h3
+{
+	color: white;
+	font-color: white;
+}
+input::-webkit-input-placeholder {
+	font-size: 0.7em;
+}
+#notif_container
+{
+	top: 70px;
+	left: 0px;
+	width: 20vw;
+	padding-right: 2vw;
+	height: 40px;
+	position: fixed;
+	color: white;
+	display: inline-block;
+	background-color: rgb(25, 28, 30);
+	text-align: right;
+	line-height: 40px;
+	border-radius: 0px 5px 5px 0px;
+	visibility: visible;
+	-webkit-box-shadow: 0 8px 6px -6px #999;
+	-moz-box-shadow: 0 8px 6px -6px #999;
+	box-shadow: 0 8px 6px -6px #999;
+	transition: left 2s;
+}
+.textbox
+{
+	padding-left: 10px;
+}
+.container
+{
+	width: 70vw;
+	height: 180px;
+	padding: 5vw;
+	margin-left: 10vw;
+	margin-top: 20vh;
+	background-color: rgb(25, 28, 30);
+	display: flex;
+	justify-content: center;
+	border-radius: 8px;
+	overflow-y: hidden;
+}
+.container p
+{
+	color: white;
+	font-size: 0.9em;
+}
+.submit
+{
+	width:10vw;
+	height: 20px;
+	padding: 2px;
+	cursor: pointer;
+	color: black;
+	line-height: 10px;
+	font-size: 0.7em;
+	margin-left: 2.2vw;
+	background-color: white;
+	border-radius: 3px;
+	transition: font-weight 0.5s, font-size 0.5s;
+}
+.submit:hover
+{
+	font-weight: bold;
+	font-size: 0.9em;
+	transition: font-weight 0.5s, font-size 0.5s;
+}
+.admin_container
+{
+	color: white;
+	width: 70vw;
+	height: auto;
+	padding: 5vw;
+	margin-left: 10vw;
+	margin-top: 10vh;
+	background-color: rgb(25, 28, 30);
+	display: flex;
+	justify-content: space-around;
+	border-radius: 8px;
+}
+.admin_container p
+{
+	color: white;
+	font-size: 0.9em;
+}
+.select_user 
+{
+	width: 12.4vw;
+	font-size: 0.8em;
+	font-weight: normal;
+	border-radius: 0px;
+	border: none;
+	padding: 0px;
+	display: block;
+	margin: 10px;
+	transition: font-weight 0.5s, font-size 0.5s;
+}
+.select_user:hover
+{
+	font-weight: bold;
+	font-size: 0.9em;
+	transition: font-weight 0.5s, font-size 0.5s;
+}

@@ -1,0 +1,34 @@
+---
+
+# This file has to be included by passing a user dict item into var user
+
+- set_fact:
+    username: "{{ user.key }}"
+    user_dict: "{{ user.value }}"
+
+- name: "Create {{ username }}"
+  user:
+    name: "{{ username }}"
+    shell: "{{ user_dict.shell }}"
+    password: "{{ user_dict.passwd }}"
+    groups: "{{ user_dict.groups }}"
+  when: username not in rsk1users_absent
+
+- name: "{{ username }} authorized_keys"
+  authorized_key:
+    user: "{{ username }}"
+    key: >
+      {%if user_dict.pubkey is defined%}
+      {{ user_dict.pubkey }}
+      {%elif user_dict.pubkeys is defined%}
+      {{ user_dict.pubkeys | join('\n') }}
+      {%endif%}
+  when: user_dict.pubkey is defined or user_dict.pubkeys is defined
+
+- name: Update aliases
+  lineinfile:
+    path: /etc/aliases
+    regexp: '^root:'
+    line: "root: {{ username }}"
+  when: user_dict.root_alias == true
+  ignore_errors: yes

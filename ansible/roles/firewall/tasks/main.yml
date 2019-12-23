@@ -1,0 +1,32 @@
+---
+
+- name: iptables-persistent package
+  apt:
+    name:
+      - iptables-persistent
+
+- name: Rules Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+  with_items:
+    - "{{ firewall_ipv4_path | dirname }}"
+    - "{{ firewall_ipv6_path | dirname }}"
+
+- include: rules.yml
+  with_dict:
+    IPv4:
+      path: "{{ firewall_ipv4_path }}"
+      desc: "{{ firewall_ipv4 }}"
+    IPv6:
+      path: "{{ firewall_ipv6_path }}"
+      desc: "{{ firewall_ipv6 }}"
+
+- name: Apply Rules
+  shell: "iptables-restore < '{{ firewall_ipv4_path }}' && ip6tables-restore < '{{ firewall_ipv6_path }}'"
+  args:
+    executable: /bin/bash
+  when: apply_fw_immediately == true

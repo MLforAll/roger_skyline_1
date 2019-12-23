@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# ROOT CHECK
+if [ $(id -u) -ne 0 ]; then
+	echo 'You must be root!' 1>&2
+	exit 1
+fi
+
+# VARIABLES
+sumsDir='/var/log/crontabs_sums'
+tmpSumsDir='/tmp/crontabs_sums_tmp'
+
+# CODE
+[ -d "$sumsDir" ] || mkdir -p "$sumsDir"
+[ -d "$tmpSumsDir" ] || mkdir -p "$tmpSumsDir"
+
+for filetc in '/etc/crontab' /var/spool/cron/crontabs/*
+do
+	basename=$(basename "$filetc")
+	md5file="$sumsDir/crontab_${basename}_md5.txt"
+	md5tmp="$tmpSumsDir/crontab_${basename}_md5_tmp.txt"
+
+	[ -f "$md5file" ] || md5sum "$filetc" > "$md5file"
+	md5sum "$filetc" > "$md5tmp"
+
+	if [ ! -z "$(diff "$md5file" "$md5tmp")" ]; then
+		[ -t 1 ] && echo "[NOTIFICATION] $filetc has changed! Mail sent to root!"
+		echo "$filetc has changed!" | mail -s "$filetc notification" root
+		rm -f "$md5file"
+		mv "$md5tmp" "$md5file"
+	else
+		rm -f "$md5tmp"
+	fi
+done
+
+rm -rf "$tmpSumsDir"

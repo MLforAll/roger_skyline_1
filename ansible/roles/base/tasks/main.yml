@@ -1,0 +1,54 @@
+---
+
+- name: Install Tools (sudo, ifconfig, curl, etc...)
+  apt:
+    name:
+      - sudo
+      - curl
+      - net-tools
+      - mailutils
+
+- include: hostname.yml
+- include: users.yml
+- include: scripts.yml
+
+- name: Interfaces Replace
+  copy:
+    src: interfaces
+    dest: /etc/network/interfaces
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Interfaces Restart
+  systemd:
+    name: networking
+    state: restarted
+  when: restart_networking_immediately == true
+
+- name: SSH Settings
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?{{ item.key }} *"
+    line: "{{ item.key }} {{ item.value }}"
+  with_dict:
+    Port: '2022'
+    PubkeyAuthentication: 'yes'
+    PasswordAuthentication: 'no'
+    PermitRootLogin: 'no'
+
+- name: SSH Reload
+  systemd:
+    name: sshd
+    state: reloaded
+  when: reload_sshd_immediately == true
+
+- name: "Set timezone to {{ rsk_timezone }}"
+  timezone:
+    name: "{{ rsk_timezone }}"
+
+- name: Restart cron
+  systemd:
+    name: cron
+    state: restarted
+  ignore_errors: yes
